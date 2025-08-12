@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$XNL to the Moon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .background-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .background-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+        }
+
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.4) 0%, 
+                rgba(26, 13, 46, 0.3) 25%, 
+                rgba(22, 33, 62, 0.3) 50%, 
+                rgba(14, 52, 96, 0.3) 75%, 
+                rgba(45, 27, 105, 0.4) 100%);
+            animation: overlayPulse 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes overlayPulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 0.8; }
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
+            border-radius: 50%;
+            animation: neonTwinkle 3s infinite alternate;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes neonTwinkle {
+            0% { 
+                opacity: 0.3; 
+                transform: scale(0.8);
+                filter: hue-rotate(0deg);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1.2);
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        .cyberpunk-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .moon {
+            position: absolute;
+            top: 10%;
+            right: 15%;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, #00ffff, #0080ff, #004080);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 60px rgba(0, 255, 255, 0.8),
+                inset 0 0 30px rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            border: 2px solid #00ffff;
+            animation: moonPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes moonPulse {
+            0% { 
+                box-shadow: 
+                    0 0 60px rgba(0, 255, 255, 0.8),
+                    inset 0 0 30px rgba(255, 255, 255, 0.2);
+            }
+            100% { 
+                box-shadow: 
+                    0 0 100px rgba(0, 255, 255, 1),
+                    inset 0 0 40px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        .moon::before {
+            content: '$XNL';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .moon::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            right: 10%;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+        }
+
+        .rocket {
+            position: absolute;
+            bottom: 20%;
+            left: 20%;
+            font-size: 50px;
+            transition: all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-origin: center;
+            filter: drop-shadow(0 0 20px #00ffff);
+            animation: rocketIdle 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes rocketIdle {
+            0% { 
+                transform: translateY(0px) rotate(0deg);
+                filter: drop-shadow(0 0 20px #00ffff);
+            }
+            100% { 
+                transform: translateY(-10px) rotate(5deg);
+                filter: drop-shadow(0 0 30px #ff00ff);
+            }
+        }
+
+        .rocket.launching {
+            transform: translateX(calc(100vw - 350px)) translateY(-350px) rotate(45deg);
+            filter: drop-shadow(0 0 50px #ffff00);
+            animation: none;
+        }
+
+        .impact-effect {
+            position: absolute;
+            top: 10%;
+            right: 15%;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,1) 0%, rgba(255,165,0,0.8) 30%, rgba(255,69,0,0.6) 60%, transparent 100%);
+            transform: scale(0);
+            animation: explosion 1.2s ease-out;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @keyframes explosion {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            30% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+            60% {
+                transform: scale(3);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(5);
+                opacity: 0;
+            }
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 300% 300%;
+            animation: gradientShift 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+            font-weight: 300;
+            letter-spacing: 1px;
+            animation: subtitleGlow 4s ease-in-out infinite alternate;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes subtitleGlow {
+            0% { 
+                color: #00ffff;
+                text-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+            }
+            100% { 
+                color: #ff00ff;
+                text-shadow: 0 0 30px rgba(255, 0, 255, 0.9);
+            }
+        }
+
+        .rocket-emoji {
+            font-size: 2rem;
+            margin: 0 0.5rem;
+        }
+
+        .counter-section {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .counter {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00ffff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
+            margin: 1rem 0;
+            animation: counterPulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes counterPulse {
+            0% { 
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            100% { 
+                transform: scale(1.05);
+                filter: brightness(1.2);
+            }
+        }
+
+        .click-button {
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00);
+            background-size: 200% 200%;
+            border: 3px solid #00ffff;
+            padding: 25px 50px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #000;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 
+                0 10px 30px rgba(0, 255, 255, 0.4),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 2rem 0;
+            animation: buttonShine 2s ease-in-out infinite;
+            font-family: 'Orbitron', monospace;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0) scale(1);
+        }
+
+        @keyframes buttonShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .click-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 15px 40px rgba(0, 255, 255, 0.8),
+                inset 0 0 30px rgba(255, 255, 255, 0.3);
+            border-color: #ff00ff;
+        }
+
+        .click-button:active {
+            transform: translateY(1px) scale(0.99);
+            box-shadow: 
+                0 5px 15px rgba(0, 255, 255, 0.6),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            border-color: #ffff00;
+        }
+
+        .status {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin: 1rem 0;
+        }
+
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(26, 13, 46, 0.9));
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            color: #00ffff;
+            font-weight: bold;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.6);
+        }
+
+        .music-control.muted {
+            border-color: #ff6666;
+            color: #ff6666;
+            box-shadow: 0 0 30px rgba(255, 102, 102, 0.4);
+        }
+
+        .total-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(26, 13, 46, 0.9));
+            padding: 20px 25px;
+            border-radius: 15px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            animation: totalCounterGlow 5s ease-in-out infinite alternate;
+            z-index: 10;
+        }
+
+        @keyframes totalCounterGlow {
+            0% { 
+                border-color: #00ffff;
+                box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            }
+            100% { 
+                border-color: #ff00ff;
+                box-shadow: 0 0 40px rgba(255, 0, 255, 0.6);
+            }
+        }
+
+        .floating-text {
+            position: absolute;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 900;
+            pointer-events: none;
+            animation: float-up 2s ease-out forwards;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle-float 2s ease-out forwards;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes particle-float {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <canvas id="backgroundCanvas" class="background-image"></canvas>
+    </div>
+    <div class="background-overlay"></div>
+    
+    <div class="stars" id="stars"></div>
+    <div class="cyberpunk-grid"></div>
+    
+    <div class="music-control" id="musicControl" title="Toggle Background Music">
+        🎵 MUSIC ON
+    </div>
+    
+    <div class="moon" id="moon"></div>
+    <div class="rocket" id="rocket">🚀</div>
+
+    <h1>$XNL TO THE MOON</h1>
+    
+    <div class="subtitle">
+        Every launch brings us closer to the digital frontier!
+        <span class="rocket-emoji">🚀</span>🌐
+    </div>
+
+    <div class="counter-section">
+        <div>Rockets Launched</div>
+        <div class="counter" id="counter">0</div>
+        <button class="click-button" id="clickButton">$XNL TO THE MOON!</button>
+        <div class="status">Status: Neural network synchronized... 🔮</div>
+    </div>
+
+    <div class="total-counter">
+        <div>Total Launches by All Users</div>
+        <div style="color: #00ffff; font-size: 1.8rem; font-weight: bold; text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);" id="totalCounter">42,069</div>
+    </div>
+
+    <script>
+        let count = 0;
+        let totalCount = 42069;
+        let isAnimating = false;
+
+        const counter = document.getElementById('counter');
+        const totalCounter = document.getElementById('totalCounter');
+        const clickButton = document.getElementById('clickButton');
+        const rocket = document.getElementById('rocket');
+        const moon = document.getElementById('moon');
+        const musicControl = document.getElementById('musicControl');
+
+        // Set up background canvas with your cityscape image
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawBackground();
+        }
+
+        function drawBackground() {
+            // Create a futuristic cityscape background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0a1428');
+            gradient.addColorStop(0.3, '#1a2850');
+            gradient.addColorStop(0.6, '#2d4a78');
+            gradient.addColorStop(1, '#4a6fa5');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw buildings silhouette
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            const buildingHeights = [0.4, 0.6, 0.5, 0.7, 0.8, 0.6, 0.9, 0.5, 0.7, 0.6, 0.8, 0.4];
+            const buildingWidth = canvas.width / buildingHeights.length;
+            
+            buildingHeights.forEach((height, i) => {
+                const buildingHeight = canvas.height * height;
+                ctx.fillRect(i * buildingWidth, canvas.height - buildingHeight, buildingWidth, buildingHeight);
+                
+                // Add some glowing windows
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.6)';
+                for (let j = 0; j < Math.floor(height * 20); j++) {
+                    if (Math.random() > 0.7) {
+                        const x = i * buildingWidth + Math.random() * (buildingWidth - 6);
+                        const y = canvas.height - buildingHeight + Math.random() * (buildingHeight - 6);
+                        ctx.fillRect(x, y, 4, 6);
+                    }
+                }
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            });
+            
+            // Add some neon glow effects
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#00ffff';
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height * 0.6);
+            ctx.lineTo(canvas.width, canvas.height * 0.55);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Generate stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 60 + '%'; // Keep stars in upper portion
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        createStars();
+
+        // Button click handler
+        clickButton.addEventListener('click', () => {
+            if (isAnimating) return;
+            
+            count++;
+            totalCount++;
+            counter.textContent = count.toLocaleString();
+            totalCounter.textContent = totalCount.toLocaleString();
+            
+            // Animate rocket launch
+            animateRocketLaunch();
+            createParticles();
+            createFloatingText();
+            playLaunchSound();
+        });
+
+        function animateRocketLaunch() {
+            isAnimating = true;
+            rocket.classList.add('launching');
+            
+            setTimeout(() => {
+                // Create explosion effect
+                const explosion = document.createElement('div');
+                explosion.className = 'impact-effect';
+                document.body.appendChild(explosion);
+                
+                setTimeout(() => {
+                    explosion.remove();
+                    rocket.classList.remove('launching');
+                    isAnimating = false;
+                }, 1200);
+            }, 1500);
+        }
+
+        function createParticles() {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = (rocket.offsetLeft + 25) + 'px';
+                    particle.style.top = (rocket.offsetTop + 25) + 'px';
+                    particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 2000);
+                }, i * 50);
+            }
+        }
+
+        function createFloatingText() {
+            const texts = ['TO THE MOON!', '+1', '$XNL', '🚀', '🌙'];
+            const text = document.createElement('div');
+            text.className = 'floating-text';
+            text.textContent = texts[Math.floor(Math.random() * texts.length)];
+            text.style.left = Math.random() * (window.innerWidth - 200) + 'px';
+            text.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            document.body.appendChild(text);
+            
+            setTimeout(() => text.remove(), 2000);
+        }
+
+        // Music control
+        musicControl.addEventListener('click', () => {
+            if (!audioInitialized) {
+                initAudio();
+                musicControl.textContent = '🎵 MUSIC ON';
+                musicControl.classList.remove('muted');
+            } else {
+                toggleMusic();
+                const isMuted = musicGainNode.gain.value < 0.05;
+                musicControl.textContent = isMuted ? '🔇 MUSIC OFF' : '🎵 MUSIC ON';
+                musicControl.classList.toggle('muted', isMuted);
+            }
+        });
+
+        // Audio setup
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let audioInitialized = false;
+        let backgroundMusic = null;
+        let musicGainNode = null;
+
+        function initAudio() {
+            if (!audioInitialized) {
+                audioInitialized = true;
+                audioContext.resume();
+                startBackgroundMusic();
+            }
+        }
+
+        function createBackgroundMusic() {
+            const masterGain = audioContext.createGain();
+            masterGain.connect(audioContext.destination);
+            masterGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+            
+            musicGainNode = masterGain;
+
+            // Bass line
+            const bassOsc = audioContext.createOscillator();
+            const bassGain = audioContext.createGain();
+            const bassFilter = audioContext.createBiquadFilter();
+            
+            bassOsc.connect(bassFilter);
+            bassFilter.connect(bassGain);
+            bassGain.connect(masterGain);
+            
+            bassOsc.type = 'sawtooth';
+            bassOsc.frequency.setValueAtTime(55, audioContext.currentTime);
+            bassFilter.type = 'lowpass';
+            bassFilter.frequency.setValueAtTime(200, audioContext.currentTime);
+            bassGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            
+            // Ambient pad
+            const padOsc1 = audioContext.createOscillator();
+            const padOsc2 = audioContext.createOscillator();
+            const padGain = audioContext.createGain();
+            const padFilter = audioContext.createBiquadFilter();
+            
+            padOsc1.connect(padFilter);
+            padOsc2.connect(padFilter);
+            padFilter.connect(padGain);
+            padGain.connect(masterGain);
+            
+            padOsc1.type = 'sawtooth';
+            padOsc2.type = 'square';
+            padOsc1.frequency.setValueAtTime(220, audioContext.currentTime);
+            padOsc2.frequency.setValueAtTime(330, audioContext.currentTime);
+            padFilter.type = 'lowpass';
+            padFilter.frequency.setValueAtTime(800, audioContext.currentTime);
+            padGain.gain.setValueAtTime(0.1, audioContext.currentTime);
+            
+            return { bassOsc, padOsc1, padOsc2, masterGain };
+        }
+
+        function startBackgroundMusic() {
+            if (backgroundMusic) return;
+            
+            backgroundMusic = createBackgroundMusic();
+            
+            const startTime = audioContext.currentTime;
+            backgroundMusic.bassOsc.start(startTime);
+            backgroundMusic.padOsc1.start(startTime);
+            backgroundMusic.padOsc2.start(startTime);
+            
+            animateBackgroundMusic();
+        }
+
+        function animateBackgroundMusic() {
+            if (!backgroundMusic) return;
+            
+            const time = audioContext.currentTime;
+            
+            // Evolving patterns
+            setTimeout(() => {
+                if (backgroundMusic) animateBackgroundMusic();
+            }, 2000);
+        }
+
+        function toggleMusic() {
+            if (musicGainNode) {
+                const currentGain = musicGainNode.gain.value;
+                const targetGain = currentGain < 0.05 ? 0.15 : 0;
+                musicGainNode.gain.setValueAtTime(targetGain, audioContext.currentTime);
+            }
+        }
+
+        function playLaunchSound() {
+            if (!audioInitialized) return;
+            
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.type = 'sawtooth';
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(2000, audioContext.currentTime);
+            
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            osc.frequency.setValueAtTime(200, audioContext.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.3);
+            
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === 'Enter') {
+                e.preventDefault();
+                clickButton.click();
+            }
+            if (e.key === 'm' || e.key === 'M') {
+                musicControl.click();
+            }
+        });
+
+        // Auto-animate counter
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                totalCount += Math.floor(Math.random() * 5) + 1;
+                totalCounter.textContent = totalCount.toLocaleString();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
